@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم مدیریت بلخ آسیا</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-box {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--dark);
+            font-weight: 500;
+            border: none;
+            padding: 12px 20px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--secondary);
+            background: none;
+            border-bottom: 3px solid var(--secondary);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .passport-item {
+            border-left: 4px solid var(--success);
+            background: #f8f9fa;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .finance-income {
+            border-left: 4px solid var(--success);
+        }
+        
+        .finance-expense {
+            border-left: 4px solid var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 10px;
+            }
+            
+            .dashboard-card {
+                margin: 10px 0;
+                padding: 15px;
+            }
+            
+            .nav-tabs .nav-link {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- صفحه لاگین -->
+    <div id="loginPage" class="container">
+        <div class="login-box">
+            <div class="text-center mb-4">
+                <h2 style="color: var(--primary);">🌍 بلخ آسیا</h2>
+                <p class="text-muted">سیستم مدیریت یکپارچه شرکت سیاحتی</p>
+            </div>
+            <form onsubmit="event.preventDefault(); login();">
+                <div class="mb-3">
+                    <label class="form-label">👤 نام کاربری</label>
+                    <input type="text" class="form-control" id="username" value="admin" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">🔒 رمز عبور</label>
+                    <input type="password" class="form-control" id="password" value="123456" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">🏢 بخش</label>
+                    <select class="form-control" id="department">
+                        <option value="passport">📄 بخش پاسپورت</option>
+                        <option value="finance">💼 بخش مالی</option>
+                        <option value="management">👑 مدیریت</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-custom w-100">🚀 ورود به سیستم</button>
+            </form>
+            <div class="mt-3 text-center">
+                <small class="text-muted">نام کاربری: admin | رمز: 123456</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحه اصلی -->
+    <div id="mainPage" class="container-fluid" style="display: none;">
+        <!-- نوار بالایی -->
+        <nav class="navbar navbar-dark" style="background: var(--primary); border-radius: 10px; margin-bottom: 20px;">
+            <div class="container-fluid">
+                <span class="navbar-brand">
+                    🌍 سیستم مدیریت بلخ آسیا
+                    <small id="userDepartment" class="d-block" style="font-size: 0.8em; color: var(--light);"></small>
+                </span>
+                <div>
+                    <span id="currentDate" class="text-light me-3"></span>
+                    <button class="btn btn-light btn-sm" onclick="logout()">🚪 خروج</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- کارت‌های آمار -->
+        <div class="row" id="statsSection" style="display: none;">
+            <div class="col-md-3 col-6">
+                <div class="stats-card">
+                    <h5>📊 پاسپورت‌ها</h5>
+                    <h3 id="statsPassports">0</h3>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stats-card">
+                    <h5>💰 درآمد</h5>
+                    <h3 id="statsIncome">0</h3>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stats-card">
+                    <h5>💸 هزینه</h5>
+                    <h3 id="statsExpense">0</h3>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stats-card">
+                    <h5>📈 سود</h5>
+                    <h3 id="statsProfit">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- تب‌ها -->
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#passportTab">📄 مدیریت پاسپورت</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#financeTab">💼 مدیریت مالی</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#reportsTab">📊 گزارشات کامل</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3">
+            <!-- تب پاسپورت -->
+            <div class="tab-pane fade show active" id="passportTab">
+                <div class="dashboard-card">
+                    <h4>➕ ثبت پاسپورت جدید</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="fullName" placeholder="👤 نام کامل">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="passportNumber" placeholder="📇 شماره پاسپورت">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="tazkeraNumber" placeholder="🆔 شماره تذکره">
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" id="purposeType">
+                                <option value="">🎯 انتخاب هدف</option>
+                                <option value="ticket">✈️ تکت</option>
+                                <option value="visa">🌍 ویزا</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <input type="text" class="form-control" id="destinationCountry" placeholder="🗺️ کشور مقصد">
+                        </div>
+                        <div class="col-12">
+                            <textarea class="form-control" id="notes" placeholder="📝 یادداشت‌ها (اختیاری)" rows="2"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success w-100" onclick="savePassport()">
+                                💾 ثبت پاسپورت
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>📋 لیست پاسپورت‌ها</h5>
+                        <button class="btn btn-outline-danger btn-sm" onclick="clearAllPassports()">
+                            🗑️ حذف همه
+                        </button>
+                    </div>
+                    <div id="passportList" class="mt-3">
+                        <!-- لیست پاسپورت‌ها اینجا نمایش داده می‌شود -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- تب مالی -->
+            <div class="tab-pane fade" id="financeTab">
+                <div class="dashboard-card">
+                    <h4>💵 ثبت تراکنش مالی</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <select class="form-control" id="transactionType">
+                                <option value="income">💰 درآمد</option>
+                                <option value="expense">💸 هزینه</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="number" class="form-control" id="amount" placeholder="💲 مبلغ به افغانی">
+                        </div>
+                        <div class="col-12">
+                            <input type="text" class="form-control" id="description" placeholder="📝 توضیحات تراکنش">
+                        </div>
+                        <div class="col-12">
+                            <select class="form-control" id="financeCategory">
+                                <option value="">📂 دسته‌بندی (اختیاری)</option>
+                                <option value="visa">🌍 ویزا</option>
+                                <option value="ticket">✈️ تکت</option>
+                                <option value="office">🏢 دفتر</option>
+                                <option value="salary">👥 حقوق</option>
+                                <option value="other">📦 متفرقه</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success w-100" onclick="saveTransaction()">
+                                💾 ثبت تراکنش
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h5>📊 گزارش مالی لحظه‌ای</h5>
+                    <div class="row text-center">
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="finance-income p-3 rounded">
+                                <h6>💰 کل درآمد</h6>
+                                <h4 id="totalIncome">0</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="finance-expense p-3 rounded">
+                                <h6>💸 کل هزینه</h6>
+                                <h4 id="totalExpense">0</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 rounded" style="background: #e3f2fd;">
+                                <h6>📈 سود خالص</h6>
+                                <h4 id="profitLoss">0</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="p-3 rounded" style="background: #fff3cd;">
+                                <h6>📋 تراکنش‌ها</h6>
+                                <h4 id="totalTransactions">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>📋 تاریخچه تراکنش‌ها</h5>
+                        <button class="btn btn-outline-danger btn-sm" onclick="clearAllTransactions()">
+                            🗑️ حذف همه
+                        </button>
+                    </div>
+                    <div id="transactionList" class="mt-3">
+                        <!-- لیست تراکنش‌ها اینجا نمایش داده می‌شود -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- تب گزارشات -->
+            <div class="tab-pane fade" id="reportsTab">
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4>📈 گزارشات کامل سیستم</h4>
+                        <button class="btn btn-info" onclick="generateReport()">
+                            🔄 تازه‌سازی گزارش
+                        </button>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="dashboard-card">
+                                <h6>📊 آمار کلی</h6>
+                                <div id="systemReport">
+                                    <!-- گزارشات اینجا نمایش داده می‌شوند -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dashboard-card">
+                                <h6>🎯 فعالیت‌های اخیر</h6>
+                                <div id="recentActivities">
+                                    <!-- فعالیت‌های اخیر -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card mt-3">
+                        <h6>📋 خلاصه پاسپورت‌ها بر اساس کشور</h6>
+                        <div id="countryReport">
+                            <!-- گزارش کشورها -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- اسکریپت‌ها -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // مدیریت لاگین
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const department = document.getElementById('department').value;
+            
+            if (username === 'admin' && password === '123456') {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainPage').style.display = 'block';
+                document.getElementById('statsSection').style.display = 'flex';
+                document.getElementById('userDepartment').textContent = department === 'management' ? 'بخش مدیریت' : 
+                                                                      department === 'finance' ? 'بخش مالی' : 'بخش پاسپورت';
+                updateCurrentDate();
+                loadAllData();
+                showWelcomeMessage(department);
+            } else {
+                alert('❌ نام کاربری یا رمز عبور اشتباه است!');
+            }
+        }
+
+        function showWelcomeMessage(department) {
+            const messages = {
+                'management': '👑 مدیر محترم، به سیستم خوش آمدید',
+                'finance': '💼 مسئول مالی محترم، به سیستم خوش آمدید', 
+                'passport': '📄 مسئول پاسپورت محترم، به سیستم خوش آمدید'
+            };
+            alert(`✅ ${messages[department]}`);
+        }
+
+        function logout() {
+            if(confirm('⚠️ آیا مطمئن هستید که می‌خواهید خارج شوید؟')) {
+                document.getElementById('loginPage').style.display = 'block';
+                document.getElementById('mainPage').style.display = 'none';
+                document.getElementById('statsSection').style.display = 'none';
+            }
+        }
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('fa-IR', options);
+        }
+
+        // مدیریت پاسپورت‌ها
+        function savePassport() {
+            const fullName = document.getElementById('fullName').value;
+            const passportNumber = document.getElementById('passportNumber').value;
+            const tazkeraNumber = document.getElementById('tazkeraNumber').value;
+
+            if (!fullName || !passportNumber || !tazkeraNumber) {
+                alert('❌ لطفا تمام فیلدهای ضروری را پر کنید!');
+                return;
+            }
+
+            const passport = {
+                id: Date.now(),
+                fullName: fullName,
+                passportNumber: passportNumber,
+                tazkeraNumber: tazkeraNumber,
+                purpose: document.getElementById('purposeType').value,
+                country: document.getElementById('destinationCountry').value,
+                notes: document.getElementById('notes').value,
+                date: new Date().toLocaleDateString('fa-IR'),
+                time: new Date().toLocaleTimeString('fa-IR')
+            };
+
+            let passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            passports.push(passport);
+            localStorage.setItem('passports', JSON.stringify(passports));
+            
+            alert('✅ پاسپورت با موفقیت ثبت شد!');
+            loadPassports();
+            clearPassportForm();
+            updateStats();
+        }
+
+        function loadPassports() {
+            const passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            const listElement = document.getElementById('passportList');
+            
+            if (passports.length === 0) {
+                listElement.innerHTML = '<div class="text-center text-muted p-3">📝 هیچ پاسپورتی ثبت نشده است</div>';
+                return;
+            }
+            
+            listElement.innerHTML = passports.map(passport => `
+                <div class="passport-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>👤 ${passport.fullName}</strong>
+                            <br>
+                            <small>📇 پاسپورت: ${passport.passportNumber}</small> | 
+                            <small>🆔 تذکره: ${passport.tazkeraNumber}</small>
+                            <br>
+                            <small>🎯 هدف: ${passport.purpose === 'ticket' ? '✈️ تکت' : '🌍 ویزا'}</small> | 
+                            <small>🗺️ کشور: ${passport.country || 'ثبت نشده'}</small>
+                            <br>
+                            ${passport.notes ? `<small>📝 یادداشت: ${passport.notes}</small><br>` : ''}
+                            <small class="text-muted">⏰ ${passport.date} - ${passport.time}</small>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deletePassport(${passport.id})">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).reverse().join('');
+        }
+
+        function deletePassport(id) {
+            let passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            passports = passports.filter(p => p.id !== id);
+            localStorage.setItem('passports', JSON.stringify(passports));
+            loadPassports();
+            updateStats();
+            alert('✅ پاسپورت حذف شد!');
+        }
+
+        function clearAllPassports() {
+            if(confirm('⚠️ آیا مطمئن هستید که می‌خواهید تمام پاسپورت‌ها را حذف کنید؟')) {
+                localStorage.removeItem('passports');
+                loadPassports();
+                updateStats();
+                alert('✅ تمام پاسپورت‌ها حذف شدند!');
+            }
+        }
+
+        function clearPassportForm() {
+            document.getElementById('fullName').value = '';
+            document.getElementById('passportNumber').value = '';
+            document.getElementById('tazkeraNumber').value = '';
+            document.getElementById('purposeType').value = '';
+            document.getElementById('destinationCountry').value = '';
+            document.getElementById('notes').value = '';
+        }
+
+        // مدیریت مالی
+        function saveTransaction() {
+            const amount = document.getElementById('amount').value;
+            const description = document.getElementById('description').value;
+
+            if (!amount || !description) {
+                alert('❌ لطفا مبلغ و توضیحات را وارد کنید!');
+                return;
+            }
+
+            const transaction = {
+                id: Date.now(),
+                type: document.getElementById('transactionType').value,
+                amount: parseFloat(amount),
+                description: description,
+                category: document.getElementById('financeCategory').value,
+                date: new Date().toLocaleDateString('fa-IR'),
+                time: new Date().toLocaleTimeString('fa-IR')
+            };
+
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            transactions.push(transaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            alert('✅ تراکنش مالی ثبت شد!');
+            updateFinanceReport();
+            clearFinanceForm();
+            updateStats();
+        }
+
+        function updateFinanceReport() {
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            
+            const totalIncome = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+            const totalExpense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+            const profitLoss = totalIncome - totalExpense;
+
+            document.getElementById('totalIncome').textContent = totalIncome.toLocaleString();
+            document.getElementById('totalExpense').textContent = totalExpense.toLocaleString();
+            document.getElementById('profitLoss').textContent = profitLoss.toLocaleString();
+            document.getElementById('totalTransactions').textContent = transactions.length;
+
+            loadTransactionList();
+        }
+
+        function loadTransactionList() {
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            const listElement = document.getElementById('transactionList');
+            
+            if (transactions.length === 0) {
+                listElement.innerHTML = '<div class="text-center text-muted p-3">💸 هیچ تراکنشی ثبت نشده است</div>';
+                return;
+            }
+            
+            listElement.innerHTML = transactions.map(transaction => `
+                <div class="${transaction.type === 'income' ? 'finance-income' : 'finance-expense'} p-3 mb-2 rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${transaction.type === 'income' ? '💰 درآمد' : '💸 هزینه'}</strong>
+                            <br>
+                            <span>${transaction.description}</span>
+                            <br>
+                            <small>مبلغ: <strong>${transaction.amount.toLocaleString()} افغانی</strong></small>
+                            ${transaction.category ? `<br><small>دسته: ${transaction.category}</small>` : ''}
+                            <br>
+                            <small class="text-muted">⏰ ${transaction.date} - ${transaction.time}</small>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteTransaction(${transaction.id})">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            `).reverse().join('');
+        }
+
+        function deleteTransaction(id) {
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            transactions = transactions.filter(t => t.id !== id);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateFinanceReport();
+            updateStats();
+            alert('✅ تراکنش حذف شد!');
+        }
+
+        function clearAllTransactions() {
+            if(confirm('⚠️ آیا مطمئن هستید که می‌خواهید تمام تراکنش‌ها را حذف کنید؟')) {
+                localStorage.removeItem('transactions');
+                updateFinanceReport();
+                updateStats();
+                alert('✅ تمام تراکنش‌ها حذف شدند!');
+            }
+        }
+
+        function clearFinanceForm() {
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('financeCategory').value = '';
+        }
+
+        // گزارشات
+        function generateReport() {
+            const passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const netProfit = totalIncome - totalExpense;
+            
+            // گزارش کشورها
+            const countryStats = {};
+            passports.forEach(p => {
+                const country = p.country || 'نامشخص';
+                countryStats[country] = (countryStats[country] || 0) + 1;
+            });
+
+            document.getElementById('systemReport').innerHTML = `
+                <div class="alert alert-info">
+                    <p>📊 تعداد پاسپورت‌ها: <strong>${passports.length}</strong></p>
+                    <p>💰 کل درآمد: <strong>${totalIncome.toLocaleString()}</strong> افغانی</p>
+                    <p>💸 کل هزینه: <strong>${totalExpense.toLocaleString()}</strong> افغانی</p>
+                    <p>📈 سود خالص: <strong>${netProfit.toLocaleString()}</strong> افغانی</p>
+                    <p>💼 تعداد تراکنش‌ها: <strong>${transactions.length}</strong></p>
+                </div>
+            `;
+
+            // فعالیت‌های اخیر
+            const recentActivities = [
+                ...passports.slice(-3).map(p => `📄 پاسپورت جدید: ${p.fullName}`),
+                ...transactions.slice(-3).map(t => `${t.type === 'income' ? '💰' : '💸'} ${t.description}: ${t.amount} افغانی`)
+            ].reverse();
+
+            document.getElementById('recentActivities').innerHTML = recentActivities.length > 0 ? 
+                recentActivities.map(activity => `<div class="border-bottom pb-2 mb-2">${activity}</div>`).join('') :
+                '<div class="text-muted">📝 هیچ فعالیتی ثبت نشده است</div>';
+
+            // گزارش کشورها
+            const countryReportHTML = Object.entries(countryStats).map(([country, count]) => `
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span>🗺️ ${country}</span>
+                    <span class="badge bg-primary">${count}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('countryReport').innerHTML = countryReportHTML || 
+                '<div class="text-muted">🌍 هیچ اطلاعاتی برای نمایش وجود ندارد</div>';
+        }
+
+        // آمار کلی
+        function updateStats() {
+            const passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const netProfit = totalIncome - totalExpense;
+
+            document.getElementById('statsPassports').textContent = passports.length;
+            document.getElementById('statsIncome').textContent = totalIncome.toLocaleString();
+            document.getElementById('statsExpense').textContent = totalExpense.toLocaleString();
+            document.getElementById('statsProfit').textContent = netProfit.toLocaleString();
+        }
+
+        // بارگذاری اولیه داده‌ها
+        function loadAllData() {
+            loadPassports();
+            updateFinanceReport();
+            generateReport();
+            updateStats();
+        }
+
+        // مقداردهی اولیه
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+        });
+    </script>
+</body>
+</html>
