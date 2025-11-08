@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* استایل‌های کامل سیستم */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
@@ -43,18 +42,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
-        @media (min-width: 1024px) {
-            body { padding: 40px; }
-            .login-box { max-width: 500px; margin: 100px auto; }
-            .dashboard-card { padding: 30px; margin: 20px 0; }
-        }
-        
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .login-box { margin: 20px auto; padding: 20px; }
-            .dashboard-card { margin: 10px 0; padding: 15px; }
-        }
-
         .nav-tabs .nav-link {
             color: var(--dark);
             font-weight: 500;
@@ -112,6 +99,37 @@
             padding: 15px;
             border-radius: 8px;
         }
+        
+        .agent-card {
+            border-left: 4px solid var(--warning);
+            background: #fffbf0;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            margin: 10px 0;
+        }
+        
+        .file-preview {
+            max-width: 200px;
+            max-height: 150px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .login-box { margin: 20px auto; padding: 20px; }
+            .dashboard-card { margin: 10px 0; padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -137,6 +155,7 @@
                         <option value="management">مدیریت</option>
                         <option value="finance">مالی</option>
                         <option value="passport">پاسپورت</option>
+                        <option value="agents">نمایندگان</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-custom w-100">🚀 ورود به سیستم</button>
@@ -182,8 +201,8 @@
             </div>
             <div class="col-md-3 col-6">
                 <div class="stats-card">
-                    <h5>📈 سود</h5>
-                    <h3 id="statsProfit">0</h3>
+                    <h5>👥 نمایندگان</h5>
+                    <h3 id="statsAgents">0</h3>
                 </div>
             </div>
         </div>
@@ -195,6 +214,9 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#financeTab">💼 مدیریت مالی</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#agentsTab">👥 مدیریت نمایندگان</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#reportsTab">📊 گزارشات کامل</a>
@@ -223,8 +245,47 @@
                                 <option value="visa">🌍 ویزا</option>
                             </select>
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <input type="text" class="form-control" id="destinationCountry" placeholder="🗺️ کشور مقصد">
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" id="passportSource">
+                                <option value="direct">🎯 مستقیماً از دفتر</option>
+                                <option value="agent">👥 از طریق نماینده</option>
+                            </select>
+                        </div>
+                        <div class="col-12" id="agentSelection" style="display: none;">
+                            <select class="form-control" id="selectedAgent">
+                                <option value="">انتخاب نماینده</option>
+                            </select>
+                        </div>
+
+                        <!-- بخش آپلود فایل‌ها -->
+                        <div class="col-12">
+                            <div class="file-upload-area">
+                                <h6>📎 آپلود اسناد</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>🖼️ عکس پرسنلی</label>
+                                        <input type="file" class="form-control" id="personalPhoto" accept="image/*" onchange="previewFile('personalPhoto', 'photoPreview')">
+                                        <img id="photoPreview" class="file-preview" style="display: none;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>📄 اسکن پاسپورت</label>
+                                        <input type="file" class="form-control" id="passportScan" accept="image/*,.pdf" onchange="previewFile('passportScan', 'passportPreview')">
+                                        <img id="passportPreview" class="file-preview" style="display: none;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>🆔 اسکن تذکره</label>
+                                        <input type="file" class="form-control" id="tazkeraScan" accept="image/*,.pdf" onchange="previewFile('tazkeraScan', 'tazkeraPreview')">
+                                        <img id="tazkeraPreview" class="file-preview" style="display: none;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <textarea class="form-control" id="notes" placeholder="📝 یادداشت‌ها (اختیاری)" rows="2"></textarea>
                         </div>
                         <div class="col-12">
                             <button class="btn btn-success w-100" onclick="savePassport()">
@@ -237,9 +298,14 @@
                 <div class="dashboard-card">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5>📋 لیست پاسپورت‌ها</h5>
-                        <button class="btn btn-outline-danger btn-sm" onclick="clearAllPassports()">
-                            🗑️ حذف همه
-                        </button>
+                        <div>
+                            <button class="btn btn-info btn-sm me-2" onclick="generatePassportsPDF()">
+                                📥 دانلود PDF پاسپورت‌ها
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="clearAllPassports()">
+                                🗑️ حذف همه
+                            </button>
+                        </div>
                     </div>
                     <div id="passportList" class="mt-3"></div>
                 </div>
@@ -250,24 +316,35 @@
                 <div class="dashboard-card">
                     <h4>💱 ثبت تراکنش مالی</h4>
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <select class="form-control" id="transactionType">
                                 <option value="income">💰 درآمد</option>
                                 <option value="expense">💸 هزینه</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <select class="form-control" id="currencyType">
                                 <option value="AFN">🇦🇫 افغانی (AFN)</option>
                                 <option value="USD">🇺🇸 دالر (USD)</option>
                                 <option value="IRR">🇮🇷 تومان (IRR)</option>
                             </select>
                         </div>
-                        <div class="col-12">
+                        <div class="col-md-4">
                             <input type="number" class="form-control" id="amount" placeholder="💲 مبلغ">
                         </div>
                         <div class="col-12">
                             <input type="text" class="form-control" id="description" placeholder="📝 توضیحات تراکنش">
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-control" id="transactionSource">
+                                <option value="direct">🎯 مستقیماً از دفتر</option>
+                                <option value="agent">👥 از طریق نماینده</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="transactionAgentSelection" style="display: none;">
+                            <select class="form-control" id="selectedTransactionAgent">
+                                <option value="">انتخاب نماینده</option>
+                            </select>
                         </div>
                         <div class="col-12">
                             <button class="btn btn-success w-100" onclick="saveTransaction()">
@@ -318,6 +395,42 @@
                 </div>
             </div>
 
+            <!-- تب نمایندگان -->
+            <div class="tab-pane fade" id="agentsTab">
+                <div class="dashboard-card">
+                    <h4>👥 ثبت نماینده جدید</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="agentName" placeholder="👤 نام کامل نماینده">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="agentPhone" placeholder="📞 شماره تماس">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="agentAddress" placeholder="🏠 آدرس">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="number" class="form-control" id="agentCommission" placeholder="💸 درصد کمیسیون" value="10">
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-success w-100" onclick="saveAgent()">
+                                💾 ثبت نماینده
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5>📋 لیست نمایندگان</h5>
+                        <button class="btn btn-outline-danger btn-sm" onclick="clearAllAgents()">
+                            🗑️ حذف همه
+                        </button>
+                    </div>
+                    <div id="agentsList" class="mt-3"></div>
+                </div>
+            </div>
+
             <!-- تب گزارشات -->
             <div class="tab-pane fade" id="reportsTab">
                 <div class="dashboard-card">
@@ -327,7 +440,26 @@
                             🔄 تازه‌سازی گزارش
                         </button>
                     </div>
-                    <div id="systemReport" class="mt-3"></div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="dashboard-card">
+                                <h6>📊 آمار کلی</h6>
+                                <div id="systemReport"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="dashboard-card">
+                                <h6>🎯 فعالیت‌های اخیر</h6>
+                                <div id="recentActivities"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card mt-3">
+                        <h6>📋 عملکرد نمایندگان</h6>
+                        <div id="agentsPerformance"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -354,10 +486,19 @@
                 department: 'passport', 
                 name: 'مسئول پاسپورت',
                 permissions: ['passport']
+            },
+            'agents1': { 
+                password: 'blk2024agents', 
+                department: 'agents', 
+                name: 'مسئول نمایندگان',
+                permissions: ['agents']
             }
         };
 
-        // توابع سیستم
+        // کلید encryption
+        const ENCRYPTION_KEY = 'balkh-asia-secure-key-2024';
+
+        // مدیریت لاگین
         function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -367,20 +508,35 @@
                 const userSession = {
                     username: username,
                     department: department,
-                    loginTime: new Date().getTime()
+                    loginTime: new Date().getTime(),
+                    token: generateToken()
                 };
                 
-                localStorage.setItem('userSession', JSON.stringify(userSession));
+                localStorage.setItem('userSession', encryptData(JSON.stringify(userSession)));
                 document.getElementById('masterLogin').style.display = 'none';
                 document.getElementById('mainSystem').style.display = 'block';
-                document.getElementById('userDepartment').textContent = 
-                    department === 'management' ? 'بخش مدیریت' : 
-                    department === 'finance' ? 'بخش مالی' : 'بخش پاسپورت';
                 
-                loadAllData();
+                initializeMainSystem(userSession);
                 alert(`✅ خوش آمدید ${users[username].name}`);
             } else {
                 alert('❌ نام کاربری، رمز عبور یا بخش انتخاب شده اشتباه است!');
+            }
+        }
+
+        function generateToken() {
+            return 'token_' + Math.random().toString(36).substr(2) + Date.now().toString(36);
+        }
+
+        function encryptData(data) {
+            return btoa(unescape(encodeURIComponent(data + ENCRYPTION_KEY)));
+        }
+
+        function decryptData(encryptedData) {
+            try {
+                const decrypted = decodeURIComponent(escape(atob(encryptedData)));
+                return decrypted.replace(ENCRYPTION_KEY, '');
+            } catch (e) {
+                return null;
             }
         }
 
@@ -389,25 +545,138 @@
             location.reload();
         }
 
-        function savePassport() {
+        function checkExistingSession() {
+            const savedSession = localStorage.getItem('userSession');
+            if (savedSession) {
+                const session = JSON.parse(decryptData(savedSession));
+                const currentTime = new Date().getTime();
+                
+                if (session && (currentTime - session.loginTime) < 8 * 60 * 60 * 1000) {
+                    document.getElementById('masterLogin').style.display = 'none';
+                    document.getElementById('mainSystem').style.display = 'block';
+                    initializeMainSystem(session);
+                } else {
+                    localStorage.removeItem('userSession');
+                }
+            }
+        }
+
+        // مدیریت دسترسی‌ها
+        function initializeMainSystem(session) {
+            const user = users[session.username];
+            document.getElementById('userDepartment').textContent = 
+                user.department === 'management' ? 'بخش مدیریت' : 
+                user.department === 'finance' ? 'بخش مالی' : 
+                user.department === 'agents' ? 'بخش نمایندگان' : 'بخش پاسپورت';
+            
+            // مخفی کردن بخش‌های بدون دسترسی
+            if (!user.permissions.includes('all')) {
+                if (!user.permissions.includes('finance')) {
+                    document.querySelector('[href="#financeTab"]').parentElement.style.display = 'none';
+                }
+                if (!user.permissions.includes('passport')) {
+                    document.querySelector('[href="#passportTab"]').parentElement.style.display = 'none';
+                }
+                if (!user.permissions.includes('agents')) {
+                    document.querySelector('[href="#agentsTab"]').parentElement.style.display = 'none';
+                }
+                if (!user.permissions.includes('reports')) {
+                    document.querySelector('[href="#reportsTab"]').parentElement.style.display = 'none';
+                }
+            }
+            
+            loadAllData();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            // تغییر منبع پاسپورت
+            document.getElementById('passportSource').addEventListener('change', function() {
+                document.getElementById('agentSelection').style.display = 
+                    this.value === 'agent' ? 'block' : 'none';
+                loadAgentsToSelect('selectedAgent');
+            });
+
+            // تغییر منبع تراکنش
+            document.getElementById('transactionSource').addEventListener('change', function() {
+                document.getElementById('transactionAgentSelection').style.display = 
+                    this.value === 'agent' ? 'block' : 'none';
+                loadAgentsToSelect('selectedTransactionAgent');
+            });
+        }
+
+        // پیش‌نمایش فایل
+        function previewFile(inputId, previewId) {
+            const fileInput = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        // مدیریت پاسپورت‌ها
+        async function savePassport() {
+            const fullName = document.getElementById('fullName').value;
+            const passportNumber = document.getElementById('passportNumber').value;
+            const tazkeraNumber = document.getElementById('tazkeraNumber').value;
+
+            if (!fullName || !passportNumber || !tazkeraNumber) {
+                alert('❌ لطفا تمام فیلدهای ضروری را پر کنید!');
+                return;
+            }
+
+            // خواندن فایل‌های آپلود شده
+            const personalPhotoFile = document.getElementById('personalPhoto').files[0];
+            const passportScanFile = document.getElementById('passportScan').files[0];
+            const tazkeraScanFile = document.getElementById('tazkeraScan').files[0];
+
             const passport = {
                 id: Date.now(),
-                fullName: document.getElementById('fullName').value,
-                passportNumber: document.getElementById('passportNumber').value,
-                tazkeraNumber: document.getElementById('tazkeraNumber').value,
+                fullName: fullName,
+                passportNumber: passportNumber,
+                tazkeraNumber: tazkeraNumber,
                 purpose: document.getElementById('purposeType').value,
                 country: document.getElementById('destinationCountry').value,
-                date: new Date().toLocaleDateString('fa-IR')
+                source: document.getElementById('passportSource').value,
+                agentId: document.getElementById('passportSource').value === 'agent' ? document.getElementById('selectedAgent').value : null,
+                personalPhoto: personalPhotoFile ? await fileToBase64(personalPhotoFile) : null,
+                passportScan: passportScanFile ? await fileToBase64(passportScanFile) : null,
+                tazkeraScan: tazkeraScanFile ? await fileToBase64(tazkeraScanFile) : null,
+                notes: document.getElementById('notes').value,
+                date: new Date().toLocaleDateString('fa-IR'),
+                time: new Date().toLocaleTimeString('fa-IR')
             };
 
             let passports = JSON.parse(localStorage.getItem('passports') || '[]');
             passports.push(passport);
             localStorage.setItem('passports', JSON.stringify(passports));
             
+            // اگر از طریق نماینده است، آمار را به‌روز کن
+            if (passport.source === 'agent' && passport.agentId) {
+                updateAgentStats(passport.agentId, 'passport');
+            }
+            
             alert('✅ پاسپورت با موفقیت ثبت شد!');
             loadPassports();
             clearPassportForm();
             updateStats();
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
         function loadPassports() {
@@ -422,7 +691,7 @@
             listElement.innerHTML = passports.map(passport => `
                 <div class="passport-item">
                     <div class="d-flex justify-content-between align-items-start">
-                        <div>
+                        <div style="flex: 1;">
                             <strong>👤 ${passport.fullName}</strong>
                             <br>
                             <small>📇 پاسپورت: ${passport.passportNumber}</small> | 
@@ -431,29 +700,93 @@
                             <small>🎯 هدف: ${passport.purpose === 'ticket' ? '✈️ تکت' : '🌍 ویزا'}</small> | 
                             <small>🗺️ کشور: ${passport.country || 'ثبت نشده'}</small>
                             <br>
-                            <small class="text-muted">⏰ ${passport.date}</small>
+                            <small>📦 منبع: ${passport.source === 'direct' ? '🎯 مستقیماً از دفتر' : '👥 از طریق نماینده'}</small>
+                            ${passport.agentId ? `<br><small>👥 نماینده: ${getAgentName(passport.agentId)}</small>` : ''}
+                            <br>
+                            ${passport.notes ? `<small>📝 یادداشت: ${passport.notes}</small><br>` : ''}
+                            <small class="text-muted">⏰ ${passport.date} - ${passport.time}</small>
                         </div>
-                        <button class="btn btn-outline-danger btn-sm" onclick="deletePassport(${passport.id})">
-                            🗑️
-                        </button>
+                        <div>
+                            <button class="btn btn-info btn-sm me-1" onclick="generateSinglePassportPDF(${passport.id})" title="دانلود PDF">
+                                📥 PDF
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deletePassport(${passport.id})">
+                                🗑️
+                            </button>
+                        </div>
                     </div>
+                    ${passport.personalPhoto || passport.passportScan || passport.tazkeraScan ? 
+                        '<small class="text-success">📎 اسناد ضمیمه شده</small>' : ''}
                 </div>
             `).reverse().join('');
         }
 
-        function saveTransaction() {
+        function deletePassport(id) {
+            let passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            const passport = passports.find(p => p.id === id);
+            passports = passports.filter(p => p.id !== id);
+            localStorage.setItem('passports', JSON.stringify(passports));
+            loadPassports();
+            updateStats();
+            alert('✅ پاسپورت حذف شد!');
+        }
+
+        function clearAllPassports() {
+            if(confirm('⚠️ آیا مطمئن هستید که می‌خواهید تمام پاسپورت‌ها را حذف کنید؟')) {
+                localStorage.removeItem('passports');
+                loadPassports();
+                updateStats();
+                alert('✅ تمام پاسپورت‌ها حذف شدند!');
+            }
+        }
+
+        function clearPassportForm() {
+            document.getElementById('fullName').value = '';
+            document.getElementById('passportNumber').value = '';
+            document.getElementById('tazkeraNumber').value = '';
+            document.getElementById('purposeType').value = '';
+            document.getElementById('destinationCountry').value = '';
+            document.getElementById('passportSource').value = 'direct';
+            document.getElementById('agentSelection').style.display = 'none';
+            document.getElementById('notes').value = '';
+            document.getElementById('personalPhoto').value = '';
+            document.getElementById('passportScan').value = '';
+            document.getElementById('tazkeraScan').value = '';
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('passportPreview').style.display = 'none';
+            document.getElementById('tazkeraPreview').style.display = 'none';
+        }
+
+        // مدیریت مالی
+        async function saveTransaction() {
+            const amount = document.getElementById('amount').value;
+            const description = document.getElementById('description').value;
+
+            if (!amount || !description) {
+                alert('❌ لطفا مبلغ و توضیحات را وارد کنید!');
+                return;
+            }
+
             const transaction = {
                 id: Date.now(),
                 type: document.getElementById('transactionType').value,
                 currency: document.getElementById('currencyType').value,
-                amount: parseFloat(document.getElementById('amount').value),
-                description: document.getElementById('description').value,
-                date: new Date().toLocaleDateString('fa-IR')
+                amount: parseFloat(amount),
+                description: description,
+                source: document.getElementById('transactionSource').value,
+                agentId: document.getElementById('transactionSource').value === 'agent' ? document.getElementById('selectedTransactionAgent').value : null,
+                date: new Date().toLocaleDateString('fa-IR'),
+                time: new Date().toLocaleTimeString('fa-IR')
             };
 
             let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
             transactions.push(transaction);
             localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            // اگر از طریق نماینده است، آمار را به‌روز کن
+            if (transaction.source === 'agent' && transaction.agentId) {
+                updateAgentStats(transaction.agentId, 'transaction', transaction.amount);
+            }
             
             alert('✅ تراکنش مالی ثبت شد!');
             updateFinanceReport();
@@ -464,7 +797,6 @@
         function updateFinanceReport() {
             const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
             
-            // محاسبه برای هر ارز
             const incomeAFN = transactions.filter(t => t.type === 'income' && t.currency === 'AFN').reduce((sum, t) => sum + t.amount, 0);
             const expenseAFN = transactions.filter(t => t.type === 'expense' && t.currency === 'AFN').reduce((sum, t) => sum + t.amount, 0);
             
@@ -508,7 +840,10 @@
                             <br>
                             <small>مبلغ: <strong>${transaction.amount.toLocaleString()}</strong></small>
                             <br>
-                            <small class="text-muted">⏰ ${transaction.date}</small>
+                            <small>📦 منبع: ${transaction.source === 'direct' ? '🎯 مستقیماً از دفتر' : '👥 از طریق نماینده'}</small>
+                            ${transaction.agentId ? `<br><small>👥 نماینده: ${getAgentName(transaction.agentId)}</small>` : ''}
+                            <br>
+                            <small class="text-muted">⏰ ${transaction.date} - ${transaction.time}</small>
                         </div>
                         <button class="btn btn-outline-danger btn-sm" onclick="deleteTransaction(${transaction.id})">
                             🗑️
@@ -518,9 +853,361 @@
             `).reverse().join('');
         }
 
+        function deleteTransaction(id) {
+            let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            transactions = transactions.filter(t => t.id !== id);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateFinanceReport();
+            updateStats();
+            alert('✅ تراکنش حذف شد!');
+        }
+
+        function clearAllTransactions() {
+            if(confirm('⚠️ آیا مطمئن هستید که می‌خواهید تمام تراکنش‌ها را حذف کنید؟')) {
+                localStorage.removeItem('transactions');
+                updateFinanceReport();
+                updateStats();
+                alert('✅ تمام تراکنش‌ها حذف شدند!');
+            }
+        }
+
+        function clearFinanceForm() {
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('transactionSource').value = 'direct';
+            document.getElementById('transactionAgentSelection').style.display = 'none';
+        }
+
+        // مدیریت نمایندگان
+        function saveAgent() {
+            const name = document.getElementById('agentName').value;
+            const phone = document.getElementById('agentPhone').value;
+
+            if (!name || !phone) {
+                alert('❌ لطفا نام و شماره تماس نماینده را وارد کنید!');
+                return;
+            }
+
+            const agent = {
+                id: 'agent_' + Date.now(),
+                name: name,
+                phone: phone,
+                address: document.getElementById('agentAddress').value,
+                commission: parseInt(document.getElementById('agentCommission').value) || 10,
+                totalPassports: 0,
+                totalTransactions: 0,
+                totalAmount: 0,
+                debt: 0,
+                joinDate: new Date().toLocaleDateString('fa-IR')
+            };
+
+            let agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            agents.push(agent);
+            localStorage.setItem('agents', JSON.stringify(agents));
+            
+            alert('✅ نماینده با موفقیت ثبت شد!');
+            loadAgents();
+            clearAgentForm();
+            updateStats();
+        }
+
+        function loadAgents() {
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            const listElement = document.getElementById('agentsList');
+            
+            if (agents.length === 0) {
+                listElement.innerHTML = '<div class="text-center text-muted p-3">👥 هیچ نماینده‌ای ثبت نشده است</div>';
+                return;
+            }
+            
+            listElement.innerHTML = agents.map(agent => `
+                <div class="agent-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div style="flex: 1;">
+                            <strong>👤 ${agent.name}</strong>
+                            <br>
+                            <small>📞 تلفن: ${agent.phone}</small>
+                            ${agent.address ? `<br><small>🏠 آدرس: ${agent.address}</small>` : ''}
+                            <br>
+                            <small>💸 کمیسیون: ${agent.commission}%</small> | 
+                            <small>📊 پاسپورت: ${agent.totalPassports}</small>
+                            <br>
+                            <small>💰 مجموع تراکنش: ${agent.totalAmount.toLocaleString()}</small>
+                            <br>
+                            <small>🏦 بدهی: <strong>${agent.debt.toLocaleString()}</strong></small>
+                            <br>
+                            <small class="text-muted">📅 تاریخ عضویت: ${agent.joinDate}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-warning btn-sm me-1" onclick="payAgentDebt('${agent.id}')" title="پرداخت بدهی">
+                                💵 پرداخت
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteAgent('${agent.id}')">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadAgentsToSelect(selectId) {
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            const selectElement = document.getElementById(selectId);
+            
+            selectElement.innerHTML = '<option value="">انتخاب نماینده</option>' + 
+                agents.map(agent => `<option value="${agent.id}">${agent.name} - ${agent.phone}</option>`).join('');
+        }
+
+        function getAgentName(agentId) {
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            const agent = agents.find(a => a.id === agentId);
+            return agent ? agent.name : 'نامشخص';
+        }
+
+        function updateAgentStats(agentId, type, amount = 0) {
+            let agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            const agent = agents.find(a => a.id === agentId);
+            
+            if (agent) {
+                if (type === 'passport') {
+                    agent.totalPassports += 1;
+                } else if (type === 'transaction') {
+                    agent.totalTransactions += 1;
+                    agent.totalAmount += amount;
+                    // محاسبه بدهی جدید بر اساس کمیسیون
+                    agent.debt += amount * (agent.commission / 100);
+                }
+                
+                localStorage.setItem('agents', JSON.stringify(agents));
+                loadAgents();
+            }
+        }
+
+        function payAgentDebt(agentId) {
+            const amount = prompt('مبلغ پرداختی را وارد کنید:');
+            if (amount && !isNaN(amount)) {
+                let agents = JSON.parse(localStorage.getItem('agents') || '[]');
+                const agent = agents.find(a => a.id === agentId);
+                
+                if (agent) {
+                    agent.debt = Math.max(0, agent.debt - parseFloat(amount));
+                    localStorage.setItem('agents', JSON.stringify(agents));
+                    loadAgents();
+                    alert('✅ پرداخت ثبت شد!');
+                }
+            }
+        }
+
+        function deleteAgent(agentId) {
+            let agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            agents = agents.filter(a => a.id !== agentId);
+            localStorage.setItem('agents', JSON.stringify(agents));
+            loadAgents();
+            updateStats();
+            alert('✅ نماینده حذف شد!');
+        }
+
+        function clearAllAgents() {
+            if(confirm('⚠️ آیا مطمئن هستید که می‌خواهید تمام نمایندگان را حذف کنید؟')) {
+                localStorage.removeItem('agents');
+                loadAgents();
+                updateStats();
+                alert('✅ تمام نمایندگان حذف شدند!');
+            }
+        }
+
+        function clearAgentForm() {
+            document.getElementById('agentName').value = '';
+            document.getElementById('agentPhone').value = '';
+            document.getElementById('agentAddress').value = '';
+            document.getElementById('agentCommission').value = '10';
+        }
+
+        // سیستم PDF
+        function generatePassportsPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            
+            doc.setFont('Times-Roman');
+            doc.setFontSize(16);
+            doc.text('گزارش کامل پاسپورت‌ها - شرکت بلخ آسیا', 105, 15, null, null, 'center');
+            
+            doc.setFontSize(10);
+            let yPosition = 25;
+            
+            passports.forEach((passport, index) => {
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text(`پاسپورت ${index + 1}: ${passport.fullName}`, 14, yPosition);
+                yPosition += 7;
+                
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(10);
+                doc.text(`شماره پاسپورت: ${passport.passportNumber}`, 14, yPosition);
+                yPosition += 5;
+                doc.text(`شماره تذکره: ${passport.tazkeraNumber}`, 14, yPosition);
+                yPosition += 5;
+                doc.text(`هدف: ${passport.purpose === 'ticket' ? 'تکت' : 'ویزا'}`, 14, yPosition);
+                yPosition += 5;
+                doc.text(`کشور مقصد: ${passport.country || 'ثبت نشده'}`, 14, yPosition);
+                yPosition += 5;
+                doc.text(`منبع: ${passport.source === 'direct' ? 'مستقیماً از دفتر' : 'از طریق نماینده'}`, 14, yPosition);
+                yPosition += 5;
+                if (passport.agentId) {
+                    doc.text(`نماینده: ${getAgentName(passport.agentId)}`, 14, yPosition);
+                    yPosition += 5;
+                }
+                doc.text(`تاریخ ثبت: ${passport.date}`, 14, yPosition);
+                yPosition += 5;
+                
+                if (passport.notes) {
+                    doc.text(`یادداشت: ${passport.notes}`, 14, yPosition);
+                    yPosition += 5;
+                }
+                
+                yPosition += 3;
+                doc.line(14, yPosition, 196, yPosition);
+                yPosition += 8;
+            });
+            
+            doc.save('گزارش-پاسپورت-بلخ-آسیا.pdf');
+        }
+
+        function generateSinglePassportPDF(passportId) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            const passport = passports.find(p => p.id === passportId);
+            
+            if (!passport) return;
+            
+            doc.setFont('Times-Roman');
+            doc.setFontSize(18);
+            doc.text('پرونده کامل مسافر - شرکت بلخ آسیا', 105, 20, null, null, 'center');
+            
+            doc.setFontSize(12);
+            let yPosition = 35;
+            
+            doc.setFont(undefined, 'bold');
+            doc.text('اطلاعات شخصی:', 14, yPosition);
+            yPosition += 8;
+            
+            doc.setFont(undefined, 'normal');
+            doc.text(`نام کامل: ${passport.fullName}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`شماره پاسپورت: ${passport.passportNumber}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`شماره تذکره: ${passport.tazkeraNumber}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`هدف سفر: ${passport.purpose === 'ticket' ? 'تکت' : 'ویزا'}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`کشور مقصد: ${passport.country || 'ثبت نشده'}`, 20, yPosition);
+            yPosition += 6;
+            doc.text(`منبع: ${passport.source === 'direct' ? 'مستقیماً از دفتر' : 'از طریق نماینده'}`, 20, yPosition);
+            yPosition += 6;
+            if (passport.agentId) {
+                doc.text(`نماینده: ${getAgentName(passport.agentId)}`, 20, yPosition);
+                yPosition += 6;
+            }
+            doc.text(`تاریخ ثبت: ${passport.date}`, 20, yPosition);
+            yPosition += 10;
+            
+            // اضافه کردن عکس‌ها اگر موجود باشند
+            if (passport.personalPhoto) {
+                try {
+                    doc.addPage();
+                    doc.text('عکس پرسنلی:', 14, 20);
+                    doc.addImage(passport.personalPhoto, 'JPEG', 14, 25, 80, 60);
+                } catch (e) {
+                    console.log('خطا در نمایش عکس پرسنلی');
+                }
+            }
+            
+            if (passport.passportScan) {
+                try {
+                    doc.addPage();
+                    doc.text('اسکن پاسپورت:', 14, 20);
+                    doc.addImage(passport.passportScan, 'JPEG', 14, 25, 80, 60);
+                } catch (e) {
+                    console.log('خطا در نمایش اسکن پاسپورت');
+                }
+            }
+            
+            if (passport.tazkeraScan) {
+                try {
+                    doc.addPage();
+                    doc.text('اسکن تذکره:', 14, 20);
+                    doc.addImage(passport.tazkeraScan, 'JPEG', 14, 25, 80, 60);
+                } catch (e) {
+                    console.log('خطا در نمایش اسکن تذکره');
+                }
+            }
+            
+            doc.save(`پرونده-${passport.fullName}-${passport.passportNumber}.pdf`);
+        }
+
+        // گزارشات
+        function generateReport() {
+            const passports = JSON.parse(localStorage.getItem('passports') || '[]');
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
+            
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const netProfit = totalIncome - totalExpense;
+            
+            const directPassports = passports.filter(p => p.source === 'direct').length;
+            const agentPassports = passports.filter(p => p.source === 'agent').length;
+
+            document.getElementById('systemReport').innerHTML = `
+                <div class="alert alert-info">
+                    <p>📊 تعداد پاسپورت‌ها: <strong>${passports.length}</strong></p>
+                    <p>🎯 مستقیماً از دفتر: <strong>${directPassports}</strong></p>
+                    <p>👥 از طریق نمایندگان: <strong>${agentPassports}</strong></p>
+                    <p>💰 کل درآمد: <strong>${totalIncome.toLocaleString()}</strong></p>
+                    <p>💸 کل هزینه: <strong>${totalExpense.toLocaleString()}</strong></p>
+                    <p>📈 سود خالص: <strong>${netProfit.toLocaleString()}</strong></p>
+                    <p>💼 تعداد تراکنش‌ها: <strong>${transactions.length}</strong></p>
+                </div>
+            `;
+
+            // فعالیت‌های اخیر
+            const recentActivities = [
+                ...passports.slice(-5).map(p => `📄 پاسپورت جدید: ${p.fullName} (${p.source === 'direct' ? '🎯' : '👥'})`),
+                ...transactions.slice(-5).map(t => `${t.type === 'income' ? '💰' : '💸'} ${t.description}: ${t.amount.toLocaleString()} ${t.currency}`)
+            ].reverse();
+
+            document.getElementById('recentActivities').innerHTML = recentActivities.length > 0 ? 
+                recentActivities.map(activity => `<div class="border-bottom pb-2 mb-2">${activity}</div>`).join('') :
+                '<div class="text-muted">📝 هیچ فعالیتی ثبت نشده است</div>';
+
+            // عملکرد نمایندگان
+            document.getElementById('agentsPerformance').innerHTML = agents.length > 0 ? 
+                agents.map(agent => `
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span>👤 ${agent.name}</span>
+                        <div>
+                            <span class="badge bg-primary me-1">📊 ${agent.totalPassports}</span>
+                            <span class="badge bg-success me-1">💰 ${agent.totalAmount.toLocaleString()}</span>
+                            <span class="badge bg-warning">🏦 ${agent.debt.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `).join('') : 
+                '<div class="text-muted">👥 هیچ نماینده‌ای ثبت نشده است</div>';
+        }
+
+        // آمار کلی
         function updateStats() {
             const passports = JSON.parse(localStorage.getItem('passports') || '[]');
             const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            const agents = JSON.parse(localStorage.getItem('agents') || '[]');
             
             const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
             const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
@@ -528,28 +1215,19 @@
             document.getElementById('statsPassports').textContent = passports.length;
             document.getElementById('statsIncome').textContent = totalIncome.toLocaleString();
             document.getElementById('statsExpense').textContent = totalExpense.toLocaleString();
-            document.getElementById('statsProfit').textContent = (totalIncome - totalExpense).toLocaleString();
+            document.getElementById('statsAgents').textContent = agents.length;
         }
 
+        // بارگذاری تمام داده‌ها
         function loadAllData() {
             loadPassports();
             updateFinanceReport();
+            loadAgents();
+            generateReport();
             updateStats();
         }
 
-        function checkExistingSession() {
-            const savedSession = localStorage.getItem('userSession');
-            if (savedSession) {
-                const session = JSON.parse(savedSession);
-                document.getElementById('masterLogin').style.display = 'none';
-                document.getElementById('mainSystem').style.display = 'block';
-                document.getElementById('userDepartment').textContent = 
-                    session.department === 'management' ? 'بخش مدیریت' : 
-                    session.department === 'finance' ? 'بخش مالی' : 'بخش پاسپورت';
-                loadAllData();
-            }
-        }
-
+        // مقداردهی اولیه
         document.addEventListener('DOMContentLoaded', function() {
             checkExistingSession();
         });
