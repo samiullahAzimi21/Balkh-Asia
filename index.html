@@ -168,7 +168,6 @@
     <div id="masterLogin" class="container">
         <div class="login-box">
             <div class="logo-container">
-                <!-- لوگو اینجا قرار می‌گیرد -->
                 <div class="logo-placeholder" style="width: 120px; height: 120px; background: var(--secondary); border-radius: 10px; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
                     لوگو
                 </div>
@@ -538,7 +537,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // سیستم کاربران (بدون تغییر)
+        // سیستم کاربران
         const users = {
             'admin': { 
                 password: 'blk2024admin', 
@@ -566,7 +565,7 @@
             }
         };
 
-        // مدیریت لاگین و دسترسی (بدون تغییر)
+        // مدیریت لاگین و دسترسی
         function handleLogin() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
@@ -605,7 +604,7 @@
             }
         }
 
-        // مدیریت دسترسی‌ها (بدون تغییر)
+        // مدیریت دسترسی‌ها
         function initializeMainSystem(session) {
             const user = users[session.username];
             document.getElementById('userDepartment').textContent = 
@@ -613,6 +612,7 @@
                 user.department === 'finance' ? 'بخش مالی' : 
                 user.department === 'agents' ? 'بخش نمایندگان' : 'بخش پاسپورت';
             
+            // تنظیم دسترسی‌ها
             setupPermissions(user);
             loadAllData();
         }
@@ -625,8 +625,10 @@
                 'reportsTab': document.querySelector('[onclick="switchTab(\'reportsTab\')"]').parentElement
             };
 
+            // مخفی کردن تمام تب‌ها اول
             Object.values(tabs).forEach(tab => tab.classList.add('hidden-tab'));
             
+            // نمایش تب‌های مجاز
             if (user.permissions.includes('all')) {
                 Object.values(tabs).forEach(tab => tab.classList.remove('hidden-tab'));
             } else {
@@ -644,18 +646,22 @@
                 }
             }
 
+            // نمایش تب پیش‌فرض
             switchTab('passportTab');
         }
 
         function switchTab(tabName) {
+            // مخفی کردن تمام تب‌ها
             document.querySelectorAll('.tab-pane').forEach(tab => {
                 tab.style.display = 'none';
             });
             
+            // غیرفعال کردن تمام لینک‌ها
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
             
+            // نمایش تب انتخاب شده
             document.getElementById(tabName).style.display = 'block';
             event.target.classList.add('active');
 
@@ -676,7 +682,7 @@
             }
         }
 
-        // پیش‌نمایش فایل (بدون تغییر)
+        // پیش‌نمایش فایل
         function previewFile(inputId, previewId) {
             const fileInput = document.getElementById(inputId);
             const preview = document.getElementById(previewId);
@@ -991,7 +997,7 @@
             }
         }
 
-        // مدیریت مالی (بدون تغییر زیاد)
+        // مدیریت مالی
         function saveTransaction() {
             const amount = document.getElementById('amount').value;
             const description = document.getElementById('description').value;
@@ -1222,7 +1228,7 @@
             document.getElementById('agentCredit').value = '0';
         }
 
-        // سیستم PDF (بدون تغییر)
+        // سیستم PDF
         function generatePassportsPDF() {
             try {
                 const { jsPDF } = window.jspdf;
@@ -1296,10 +1302,104 @@
         }
 
         function generateSinglePassportPDF(passportId) {
-            // پیاده‌سازی بدون تغییر
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const passports = JSON.parse(localStorage.getItem('passports') || '[]');
+                const passport = passports.find(p => p.id === passportId);
+                
+                if (!passport) {
+                    alert('❌ پاسپورت مورد نظر یافت نشد!');
+                    return;
+                }
+                
+                // عنوان
+                doc.setFont('Times-Roman');
+                doc.setFontSize(18);
+                doc.text('پرونده کامل مسافر - شرکت بلخ آسیا', 105, 20, null, null, 'center');
+                
+                // اطلاعات اصلی
+                doc.setFontSize(12);
+                let yPosition = 35;
+                
+                doc.setFont(undefined, 'bold');
+                doc.text('اطلاعات شخصی:', 14, yPosition);
+                yPosition += 8;
+                
+                doc.setFont(undefined, 'normal');
+                doc.text(`نام کامل: ${passport.fullName}`, 20, yPosition);
+                yPosition += 6;
+                doc.text(`شماره پاسپورت: ${passport.passportNumber}`, 20, yPosition);
+                yPosition += 6;
+                doc.text(`شماره تذکره: ${passport.tazkeraNumber}`, 20, yPosition);
+                yPosition += 6;
+                doc.text(`هدف سفر: ${passport.purpose === 'ticket' ? 'تکت' : 'ویزا'}`, 20, yPosition);
+                yPosition += 6;
+                doc.text(`کشور مقصد: ${passport.country || 'ثبت نشده'}`, 20, yPosition);
+                yPosition += 6;
+                doc.text(`منبع: ${passport.source === 'direct' ? 'مستقیماً از دفتر' : 'از طریق نماینده'}`, 20, yPosition);
+                yPosition += 6;
+                if (passport.agentId) {
+                    doc.text(`نماینده: ${getAgentName(passport.agentId)}`, 20, yPosition);
+                    yPosition += 6;
+                }
+                doc.text(`تاریخ ثبت: ${passport.date}`, 20, yPosition);
+                yPosition += 6;
+                doc.text(`ساعت ثبت: ${passport.time}`, 20, yPosition);
+                yPosition += 10;
+                
+                if (passport.notes) {
+                    doc.text(`یادداشت: ${passport.notes}`, 20, yPosition);
+                    yPosition += 10;
+                }
+                
+                // اضافه کردن عکس‌ها اگر موجود باشند
+                let pageCount = 1;
+                
+                if (passport.personalPhoto) {
+                    if (pageCount > 0) {
+                        doc.addPage();
+                        pageCount++;
+                    }
+                    try {
+                        doc.text('عکس پرسنلی:', 14, 20);
+                        doc.addImage(passport.personalPhoto, 'JPEG', 14, 25, 80, 60);
+                    } catch (e) {
+                        doc.text('خطا در نمایش عکس پرسنلی', 14, 30);
+                    }
+                }
+                
+                if (passport.passportScan) {
+                    doc.addPage();
+                    pageCount++;
+                    try {
+                        doc.text('اسکن پاسپورت:', 14, 20);
+                        doc.addImage(passport.passportScan, 'JPEG', 14, 25, 80, 60);
+                    } catch (e) {
+                        doc.text('خطا در نمایش اسکن پاسپورت', 14, 30);
+                    }
+                }
+                
+                if (passport.tazkeraScan) {
+                    doc.addPage();
+                    pageCount++;
+                    try {
+                        doc.text('اسکن تذکره:', 14, 20);
+                        doc.addImage(passport.tazkeraScan, 'JPEG', 14, 25, 80, 60);
+                    } catch (e) {
+                        doc.text('خطا در نمایش اسکن تذکره', 14, 30);
+                    }
+                }
+                
+                doc.save(`پرونده-${passport.fullName}-${passport.passportNumber}.pdf`);
+                alert('✅ PDF پرونده با موفقیت تولید و دانلود شد!');
+            } catch (error) {
+                alert('❌ خطا در تولید PDF پرونده. لطفا دوباره تلاش کنید.');
+                console.error('Single PDF Error:', error);
+            }
         }
 
-        // گزارشات (بدون تغییر)
+        // گزارشات
         function generateReport() {
             const passports = JSON.parse(localStorage.getItem('passports') || '[]');
             const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
